@@ -24,6 +24,178 @@ import { TextField } from '@material/web/textfield/internal/text-field';
 // Tier 2 = 211 / 213           212 / 214
 // Tier 3 = 231 / 233 / 235     232 / 234 / 235
 
+type portData = {
+  type: string;
+  manufacturer: string;
+  configVersion: string;
+  ports: {
+    SV: {
+      A: string;
+      B: string;
+    };
+    GOOSE: {
+      A: string;
+      B: string;
+    };
+  };
+};
+
+const relayPortInformation: portData[] = [
+  {
+    type: 'B30',
+    manufacturer: 'GE Multilin',
+    configVersion: '8.30',
+    ports: {
+      SV: {
+        A: '1A',
+        B: '1B'
+      },
+      GOOSE: {
+        A: '2',
+        B: '3'
+      }
+    }
+  },
+  {
+    type: 'SEL_487E_5S',
+    manufacturer: 'SEL',
+    configVersion: 'ICD-487E-5S-R003-V0-Z402006-D20211217',
+    ports: {
+      SV: {
+        A: '5A',
+        B: '5B'
+      },
+      GOOSE: {
+        A: '5A',
+        B: '5B'
+      }
+    }
+  },
+  {
+    type: 'SEL_411L_2S',
+    manufacturer: 'SEL',
+    configVersion: 'ICD-411L-2S-R001-V0-Z200006-D20210701',
+    ports: {
+      SV: {
+        A: '5A',
+        B: '5B'
+      },
+      GOOSE: {
+        A: '5A',
+        B: '5B'
+      }
+    }
+  },
+  {
+    type: 'SEL_2414',
+    manufacturer: 'SEL',
+    configVersion: 'ICD-2414-R109-V0-Z000000-D20210409',
+    ports: {
+      SV: {
+        A: 'Unavailable',
+        B: 'Unavailable'
+      },
+      GOOSE: {
+        A: '1A',
+        B: '1B'
+      }
+    }
+  },
+  {
+    type: 'PCS-221S',
+    manufacturer: 'NRR',
+    configVersion: '1.00',
+    ports: {
+      SV: {
+        A: '1',
+        B: '2'
+      },
+      GOOSE: {
+        A: '1',
+        B: '2'
+      }
+    }
+  },
+  {
+    type: '7SS85',
+    manufacturer: 'SIEMENS',
+    configVersion: 'V09.20.01',
+    ports: {
+      SV: {
+        A: 'F:CH1',
+        B: 'F:CH2'
+      },
+      GOOSE: {
+        A: 'F:CH1',
+        B: 'F:CH2'
+      }
+    }
+  },
+  {
+    type: '7SJ85',
+    manufacturer: 'SIEMENS',
+    configVersion: 'V09.20.01',
+    ports: {
+      SV: {
+        A: 'F:CH1',
+        B: 'F:CH2'
+      },
+      GOOSE: {
+        A: 'F:CH1',
+        B: 'F:CH2'
+      }
+    }
+  },
+  {
+    type: '7UT85',
+    manufacturer: 'SIEMENS',
+    configVersion: 'V09.20.01',
+    ports: {
+      SV: {
+        A: 'F:CH1',
+        B: 'F:CH2'
+      },
+      GOOSE: {
+        A: 'F:CH1',
+        B: 'F:CH2'
+      }
+    }
+  },
+  {
+    type: '6MU85',
+    manufacturer: 'SIEMENS',
+    configVersion: 'V09.20.01',
+    ports: {
+      SV: {
+        A: 'F:CH1',
+        B: 'F:CH2'
+      },
+      GOOSE: {
+        A: 'F:CH1',
+        B: 'F:CH2'
+      }
+    }
+  },
+  {
+    type: '7SL86',
+    manufacturer: 'SIEMENS',
+    configVersion: 'V09.20.01',
+    ports: {
+      SV: {
+        A: 'F:CH1',
+        B: 'F:CH2'
+      },
+      GOOSE: {
+        A: 'F:CH1',
+        B: 'F:CH2'
+      }
+    }
+  }
+];
+
+// Add: SEL-2440, SEL-751, P746 ??
+// Update versions
+
 const sampleData = `
 XAT111,GigabitEthernet1/0/1,XAT_BusA_P2
 XAT111,GigabitEthernet1/0/2,XAT_C3_P2
