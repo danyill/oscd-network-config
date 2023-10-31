@@ -1,4 +1,4 @@
-import { LitElement, PropertyValueMap, TemplateResult, css, html } from 'lit';
+import { LitElement, TemplateResult, css, html } from 'lit';
 import { property, query } from 'lit/decorators.js';
 
 import '@material/web/textfield/outlined-text-field.js';
@@ -158,6 +158,10 @@ export default class NetworkConfig extends LitElement {
           >Paste
           <md-icon slot="icon">content_paste</md-icon>
         </md-outlined-button>
+        <md-outlined-button class="clippy"
+          >Import
+          <md-icon slot="icon">attach_file</md-icon>
+        </md-outlined-button>
       </section>
       <section>
         <h2>Configuration Data</h2>
@@ -203,6 +207,10 @@ export default class NetworkConfig extends LitElement {
         <md-outlined-button class="clippy"
           >Copy
           <md-icon slot="icon">content_copy</md-icon>
+        </md-outlined-button>
+        <md-outlined-button class="clippy"
+          >Download
+          <md-icon slot="icon">download</md-icon>
         </md-outlined-button>
       </section>`;
   }

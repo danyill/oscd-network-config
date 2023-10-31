@@ -832,7 +832,7 @@
 // 		</SubNetwork>
 // 		<SubNetwork name="StationBus" desc="" type="8-MMS">
 // 			<BitRate unit="b/s" multiplier="M">100</BitRate>
-// 			<ConnectedAP iedName="GOOSE_Publisher" apName="AP1">    
+// 			<ConnectedAP iedName="GOOSE_Publisher" apName="AP1">
 // 			</ConnectedAP>
 // 		</SubNetwork>
 // 	</Communication>
