@@ -250,6 +250,9 @@ export default class NetworkConfig extends LitElement {
   @query('#input')
   inputUI!: TextField;
 
+  @query('#csv-input')
+  importCsvUI!: HTMLInputElement;
+
   @query('#output')
   outputUI!: TextField;
 
@@ -309,6 +312,8 @@ export default class NetworkConfig extends LitElement {
     this.refreshInputData();
   }
 
+  importData(): void {}
+
   render(): TemplateResult {
     return html`<section>
         <h1>
@@ -326,11 +331,20 @@ export default class NetworkConfig extends LitElement {
           }}
         >
         </md-outlined-text-field>
-        <md-outlined-button class="clippy"
+        <md-outlined-button
+          class="clippy"
+          @click=${() => {
+            navigator.clipboard.readText().then(
+              // eslint-disable-next-line no-return-assign
+              pasteText => (this.inputUI.value = pasteText)
+            );
+          }}
           >Paste
           <md-icon slot="icon">content_paste</md-icon>
         </md-outlined-button>
-        <md-outlined-button class="clippy"
+        <md-outlined-button class="clippy" @click=${() => {
+          this.importCsvUI.click();
+        }}
           >Import
           <md-icon slot="icon">attach_file</md-icon>
         </md-outlined-button>
@@ -376,15 +390,66 @@ export default class NetworkConfig extends LitElement {
           rows="5000"
         >
         </md-outlined-text-field>
-        <md-outlined-button class="clippy"
+        <md-outlined-button
+          class="clippy"
+          @click=${() => {
+            navigator.permissions
+              .query({ name: 'clipboard-write' as any })
+              .then(result => {
+                if (result.state === 'granted' || result.state === 'prompt') {
+                  navigator.clipboard.writeText(this.outputUI?.value ?? '');
+                }
+              });
+          }}
           >Copy
           <md-icon slot="icon">content_copy</md-icon>
         </md-outlined-button>
-        <md-outlined-button class="clippy"
+        <md-outlined-button
+          class="clippy"
+          @click=${() => {
+            const outputText = this.outputUI?.value ?? '';
+
+            const blob = new Blob([outputText], {
+              type: 'application/xml'
+            });
+
+            const a = document.createElement('a');
+            a.download = `Network_Configuration_${
+              this.ethernetSwitchUI?.value ?? 'Unknown'
+            }.txt`;
+            a.href = URL.createObjectURL(blob);
+            a.dataset.downloadurl = [
+              'application/xml',
+              a.download,
+              a.href
+            ].join(':');
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            setTimeout(() => {
+              URL.revokeObjectURL(a.href);
+            }, 5000);
+          }}
           >Download
           <md-icon slot="icon">download</md-icon>
         </md-outlined-button>
-      </section>`;
+      </section>
+      
+      <input @click=${
+        // eslint-disable-next-line no-return-assign
+        (event: MouseEvent) =>
+          // eslint-disable-next-line no-param-reassign
+          ((<HTMLInputElement>event.target).value = '')
+      } @change=${async (event: Event) => {
+        const file =
+          (<HTMLInputElement | null>event.target)?.files?.item(0) ?? false;
+        if (!file) return;
+
+        this.inputUI.value = await file.text();
+      }} id="csv-input" accept=".csv,.txt" type="file"></input>
+    `;
   }
 
   static styles = css`
@@ -433,6 +498,12 @@ export default class NetworkConfig extends LitElement {
     .clippy {
       position: relative;
       top: 4px;
+    }
+
+    input {
+      width: 0;
+      height: 0;
+      opacity: 0;
     }
 
     md-outlined-text-field {
