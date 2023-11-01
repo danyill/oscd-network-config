@@ -405,28 +405,12 @@ export default class NetworkConfig extends LitElement {
     this.prpNetwork =
       parseInt(selectedEthernetSwitch.slice(8, 9), 10) % 2 === 1 ? 'A' : 'B';
 
-    console.log(
-      'Ports',
-      portsToConfigure,
-      'Substation',
-      this.substation,
-      'Protection System',
-      this.protectionSystem,
-      'PRP Network',
-      this.prpNetwork,
-      'Native VLAN',
-      this.nativeVlanUI.value
-    );
-    console.log('hi');
-
     const iedPorts = Array.from(this.doc.querySelectorAll(':root > IED')).map(
       ied => ied.getAttribute('name')
     );
 
     const accessListsIn: string[] = [];
     const accessListsOut: string[] = [];
-
-    console.log(iedPorts);
 
     const interfaceDescriptions = portsToConfigure
       .filter(portInfo => iedPorts.includes(portInfo.iedName))
@@ -490,11 +474,14 @@ export default class NetworkConfig extends LitElement {
           )
           .filter(smv => smv !== '');
 
-        const macFilterInACL = `al-${portInfo.portName.replace(/ \//, '')}-in`;
+        const macFilterInACL = `al-${portInfo.portName.replace(
+          / \//,
+          ''
+        )}-in in`;
         const macFilterOutACL = `al-${portInfo.portName.replace(
           / \//,
           ''
-        )}-out`;
+        )}-out out`;
 
         if (smvMacsIngress.length > 0)
           accessListsIn.push(
@@ -535,7 +522,6 @@ export default class NetworkConfig extends LitElement {
       })
       .join('\n');
 
-    console.log(interfaceDescriptions);
     this.outputUI.value = [
       interfaceDescriptions,
       accessListsIn.join('\n'),
