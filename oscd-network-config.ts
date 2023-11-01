@@ -40,6 +40,7 @@ type portData = {
   };
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const relayPortInformation: portData[] = [
   {
     type: 'B30',
@@ -343,8 +344,14 @@ export default class NetworkConfig extends LitElement {
   substation: string = '';
 
   @property({ attribute: false })
-  portData: { switchName: string; portName: string; iedName: string, receivingPortName: string }[] | null =
-    null;
+  portData:
+    | {
+        switchName: string;
+        portName: string;
+        iedName: string;
+        receivingPortName: string;
+      }[]
+    | null = null;
 
   @property({ attribute: false })
   switchNames: string[] = [];
@@ -393,7 +400,8 @@ export default class NetworkConfig extends LitElement {
     );
 
     this.substation = selectedEthernetSwitch.slice(0, 3);
-    this.protectionSystem = <'1' | '2'>selectedEthernetSwitch.slice(6, 7) === '1' ? '1' : '2';
+    this.protectionSystem =
+      <'1' | '2'>selectedEthernetSwitch.slice(6, 7) === '1' ? '1' : '2';
     this.prpNetwork =
       parseInt(selectedEthernetSwitch.slice(8, 9), 10) % 2 === 1 ? 'A' : 'B';
 
@@ -409,49 +417,133 @@ export default class NetworkConfig extends LitElement {
       'Native VLAN',
       this.nativeVlanUI.value
     );
-    console.log('hi')
+    console.log('hi');
 
-    const otherVlans = ''
+    const iedPorts = Array.from(this.doc.querySelectorAll(':root > IED')).map(
+      ied => ied.getAttribute('name')
+    );
 
-    const iedPorts = Array.from(this.doc.querySelectorAll(':root > IED')).map(ied => ied.getAttribute('name'))
+    const accessListsIn: string[] = [];
+    const accessListsOut: string[] = [];
 
-    console.log(iedPorts)
+    console.log(iedPorts);
 
-    const something = portsToConfigure.filter(portData => iedPorts.includes(portData.iedName)).map((portData) => {
+    const interfaceDescriptions = portsToConfigure
+      .filter(portInfo => iedPorts.includes(portInfo.iedName))
+      .map(portInfo => {
+        const { iedName } = portInfo;
 
-      const iedName = portData.iedName
+        const gsePublish = Array.from(
+          this.doc.querySelectorAll(
+            `:root > Communication > SubNetwork > ConnectedAP[iedName="${iedName}"] > GSE`
+          )
+        );
+        const smvPublish = Array.from(
+          this.doc.querySelectorAll(
+            `:root > Communication > SubNetwork > ConnectedAP[iedName="${iedName}"] > SMV`
+          )
+        );
+        const gseSubscribe = Array.from(
+          this.doc.querySelectorAll(
+            `:root > Communication > SubNetwork > ConnectedAP[iedName="${iedName}"] > Private[type="Transpower-GSE-Subscribe"]`
+          )
+        );
+        const smvSubscribe = Array.from(
+          this.doc.querySelectorAll(
+            `:root > Communication > SubNetwork > ConnectedAP[iedName="${iedName}"] > Private[type="Transpower-SMV-Subscribe"]`
+          )
+        );
 
-      const gsePublish = Array.from(this.doc.querySelectorAll(`:root > Communication > SubNetwork > ConnectedAP[iedName="${iedName}"] > GSE`))
-      const smvPublish = Array.from(this.doc.querySelectorAll(`:root > Communication > SubNetwork > ConnectedAP[iedName="${iedName}"] > SMV`))
-      const gseSubscribe = Array.from(this.doc.querySelectorAll(`:root > Communication > SubNetwork > ConnectedAP[iedName="${iedName}"] > Private[type="Transpower-GSE-Subscribe"]`))
-      const smvSusbcribe = Array.from(this.doc.querySelectorAll(`:root > Communication > SubNetwork > ConnectedAP[iedName="${iedName}"] > Private[type="Transpower-SMV-Subscribe"]`))
+        const vlans = [
+          ...new Set(
+            [
+              ...gsePublish,
+              ...smvPublish,
+              ...gseSubscribe,
+              ...smvSubscribe
+            ].map(gseOrSmv =>
+              parseInt(
+                gseOrSmv.querySelector('Address > P[type="VLAN-ID"]')
+                  ?.textContent ?? '0',
+                16
+              )
+            )
+          )
+        ]
+          .filter(vlan => vlan !== 0)
+          .sort();
 
-      console.log(iedName)
-      console.log(gsePublish)
-      console.log(smvPublish)
-      console.log(gseSubscribe)
-      console.log(smvSusbcribe)
+        const smvMacsIngress = smvPublish
+          .map(
+            smv =>
+              smv
+                .querySelector('Address > P[type="MAC-Address"]')
+                ?.textContent?.trim() ?? ''
+          )
+          .filter(smv => smv !== '');
+        const smvMacsEgress = smvSubscribe
+          .map(
+            smv =>
+              smv
+                .querySelector('Address > P[type="MAC-Address"]')
+                ?.textContent?.trim() ?? ''
+          )
+          .filter(smv => smv !== '');
 
-      return `interface ${portData.portName}
-  description ${this.substation} Protection ${this.protectionSystem} LAN ${this.prpNetwork} to ${iedName} ${portData.receivingPortName} 
+        const macFilterInACL = `al-${portInfo.portName.replace(/ \//, '')}-in`;
+        const macFilterOutACL = `al-${portInfo.portName.replace(
+          / \//,
+          ''
+        )}-out`;
+
+        if (smvMacsIngress.length > 0)
+          accessListsIn.push(
+            [`mac access-list extended ${macFilterInACL}`,
+            smvMacsIngress.map(mac => `  permit host ${mac} any`).join('\n'),
+            `  deny   any any`,
+            `!`].join('\n'))
+
+        if (smvMacsEgress.length > 0)
+        accessListsIn.push(
+            [`mac access-list extended ${macFilterOutACL}`,
+            smvMacsEgress.map(mac => `  permit host ${mac} any`).join('\n'),
+            `  deny   any any`,
+            `!`].join('\n'))
+          
+
+        return `interface ${portInfo.portName}
+  description ${this.substation} Protection ${this.protectionSystem} LAN ${
+    this.prpNetwork
+  } to ${iedName} ${portInfo.receivingPortName} 
   switchport trunk native vlan ${this.nativeVlanUI.value}
-  switchport trunk allowed vlan ${this.nativeVlanUI.value}, ${otherVlans}
+  switchport trunk allowed vlan ${this.nativeVlanUI.value}${
+    vlans.length > 1 ? `,${vlans.join(',')}` : ''
+  }
   switchport mode trunk
   load-interval 30
   spanning-tree portfast trunk
   service-policy input pm-dss-prot-vlan-mark-in
-  service-policy output pm-dss-lan-out
-!`}).join('\n')
-  console.log(something)
-  this.outputUI.value = something
+  service-policy output pm-dss-lan-out${
+    smvMacsIngress.length > 0 ? `\n  mac access-group ${macFilterInACL}` : ''
+  }${smvMacsEgress.length > 0 ? `\n  mac access-group ${macFilterOutACL}` : ''}
+!`;
+      })
+      .join('\n');
 
+    console.log(interfaceDescriptions);
+    this.outputUI.value = [
+      interfaceDescriptions,
+      accessListsIn.join('\n'),
+      accessListsOut.join('\n')
+    ].join('\n');
   }
 
   protected firstUpdated(): void {
     this.refreshInputData();
   }
 
-  importData(): void { }
+  // eslint-disable-next-line class-methods-use-this
+  importData(): void {}
 
   render(): TemplateResult {
     return html`<section>
@@ -465,26 +557,27 @@ export default class NetworkConfig extends LitElement {
           label="Input CSV data in the form: Switch Name, Port Name, IED Name, Receiving Port Name"
           value="${sampleData}"
           rows="100"
+          spellcheck="false"
           @input=${() => {
-        this.refreshInputData();
-      }}
+            this.refreshInputData();
+          }}
         >
         </md-outlined-text-field>
         <md-outlined-button
           class="clippy"
           @click=${() => {
-        navigator.clipboard.readText().then(
-          // eslint-disable-next-line no-return-assign
-          pasteText => (this.inputUI.value = pasteText)
-        );
-      }}
+            navigator.clipboard.readText().then(
+              // eslint-disable-next-line no-return-assign
+              pasteText => (this.inputUI.value = pasteText)
+            );
+          }}
           >Paste
           <md-icon slot="icon">content_paste</md-icon>
         </md-outlined-button>
         <md-outlined-button class="clippy" @click=${() => {
-        this.importCsvUI.click();
-        this.refreshInputData();
-      }}
+          this.importCsvUI.click();
+          this.refreshInputData();
+        }}
           >Import
           <md-icon slot="icon">attach_file</md-icon>
         </md-outlined-button>
@@ -499,11 +592,11 @@ export default class NetworkConfig extends LitElement {
             required
           >
             ${this.switchNames.map(
-        switchName =>
-          html`<md-select-option value="${switchName}">
+              switchName =>
+                html`<md-select-option value="${switchName}">
                   <div slot="headline">${switchName}</div>
                 </md-select-option>`
-      )}
+            )}
           </md-filled-select>
           <md-outlined-text-field
             class="selection-item"
@@ -516,9 +609,9 @@ export default class NetworkConfig extends LitElement {
           <md-filled-button
             class="selection-item"
             @click=${() => {
-        if (!this.doc) return;
-        this.buildOutputConfiguration();
-      }}
+              if (!this.doc) return;
+              this.buildOutputConfiguration();
+            }}
             >Build Configuration
             <md-icon slot="icon">build</md-icon>
           </md-filled-button>
@@ -528,59 +621,63 @@ export default class NetworkConfig extends LitElement {
           type="textarea"
           label="Output switch configuration"
           rows="5000"
+          spellcheck="false"
         >
         </md-outlined-text-field>
         <md-outlined-button
           class="clippy"
           @click=${() => {
-        navigator.permissions
-          .query({ name: 'clipboard-write' as any })
-          .then(result => {
-            if (result.state === 'granted' || result.state === 'prompt') {
-              navigator.clipboard.writeText(this.outputUI?.value ?? '');
-            }
-          });
-      }}
+            navigator.permissions
+              .query({ name: 'clipboard-write' as any })
+              .then(result => {
+                if (result.state === 'granted' || result.state === 'prompt') {
+                  navigator.clipboard.writeText(this.outputUI?.value ?? '');
+                }
+              });
+          }}
           >Copy
           <md-icon slot="icon">content_copy</md-icon>
         </md-outlined-button>
         <md-outlined-button
           class="clippy"
           @click=${() => {
-        const outputText = this.outputUI?.value ?? '';
+            const outputText = this.outputUI?.value ?? '';
 
-        const blob = new Blob([outputText], {
-          type: 'application/xml'
-        });
+            const blob = new Blob([outputText], {
+              type: 'application/xml'
+            });
 
-        const a = document.createElement('a');
-        a.download = `Network_Configuration_${this.ethernetSwitchUI?.value !== '' ? this.ethernetSwitchUI?.value : 'Unknown'
-          }.txt`;
-        a.href = URL.createObjectURL(blob);
-        a.dataset.downloadurl = [
-          'application/xml',
-          a.download,
-          a.href
-        ].join(':');
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+            const a = document.createElement('a');
+            a.download = `Network_Configuration_${
+              this.ethernetSwitchUI?.value !== ''
+                ? this.ethernetSwitchUI?.value
+                : 'Unknown'
+            }.txt`;
+            a.href = URL.createObjectURL(blob);
+            a.dataset.downloadurl = [
+              'application/xml',
+              a.download,
+              a.href
+            ].join(':');
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
 
-        setTimeout(() => {
-          URL.revokeObjectURL(a.href);
-        }, 5000);
-      }}
+            setTimeout(() => {
+              URL.revokeObjectURL(a.href);
+            }, 5000);
+          }}
           >Download
           <md-icon slot="icon">download</md-icon>
         </md-outlined-button>
       </section>
       
       <input @click=${
-      // eslint-disable-next-line no-return-assign
-      (event: MouseEvent) =>
-        // eslint-disable-next-line no-param-reassign
-        ((<HTMLInputElement>event.target).value = '')
+        // eslint-disable-next-line no-return-assign
+        (event: MouseEvent) =>
+          // eslint-disable-next-line no-param-reassign
+          ((<HTMLInputElement>event.target).value = '')
       } @change=${async (event: Event) => {
         const file =
           (<HTMLInputElement | null>event.target)?.files?.item(0) ?? false;
