@@ -354,10 +354,7 @@ export default class NetworkConfig extends LitElement {
           )
           .filter(smv => smv !== '');
 
-        const macFilterInACL = `al-${portInfo.portName.replace(
-          / \//,
-          ''
-        )}-in`;
+        const macFilterInACL = `al-${portInfo.portName.replace(/ \//, '')}-in`;
         const macFilterOutACL = `al-${portInfo.portName.replace(
           / \//,
           ''
@@ -383,14 +380,22 @@ export default class NetworkConfig extends LitElement {
             ].join('\n')
           );
 
-          const manufacturer = this.doc.querySelector(`:root > IED[name="${iedName}"]`)?.getAttribute('manufacturer') ?? 'Unknown'
-          const type = this.doc.querySelector(`:root > IED[name="${iedName}"]`)?.getAttribute('type') ?? 'Unknown'
+        const manufacturer =
+          this.doc
+            .querySelector(`:root > IED[name="${iedName}"]`)
+            ?.getAttribute('manufacturer') ?? 'Unknown';
+        const type =
+          this.doc
+            .querySelector(`:root > IED[name="${iedName}"]`)
+            ?.getAttribute('type') ?? 'Unknown';
 
-          let selSpecial = null
-          if (manufacturer === 'SEL' && (type === 'SEL_411L_2S' || type === 'SEL_487E_5S')) {
-            selSpecial = `\n  speed nonegotiate`
-          }
-        
+        let selSpecial = null;
+        if (
+          manufacturer === 'SEL' &&
+          (type === 'SEL_411L_2S' || type === 'SEL_487E_5S')
+        ) {
+          selSpecial = `\n  speed nonegotiate`;
+        }
 
         return `interface ${portInfo.portName}
   description ${this.substation} Protection ${this.protectionSystem} LAN ${
@@ -401,12 +406,16 @@ export default class NetworkConfig extends LitElement {
     vlans.length > 1 ? `,${vlans.join(',')}` : ''
   }
   switchport mode trunk
-  load-interval 30${selSpecial !== null ? selSpecial: ''}
+  load-interval 30${selSpecial !== null ? selSpecial : ''}
   spanning-tree portfast trunk
   service-policy input pm-dss-prot-vlan-mark-in
   service-policy output pm-dss-lan-out${
     smvMacsIngress.length > 0 ? `\n  mac access-group ${macFilterInACL} in` : ''
-  }${smvMacsEgress.length > 0 ? `\n  mac access-group ${macFilterOutACL} out` : ''}
+  }${
+    smvMacsEgress.length > 0
+      ? `\n  mac access-group ${macFilterOutACL} out`
+      : ''
+  }
 !`;
       })
       .join('\n');
