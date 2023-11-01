@@ -357,11 +357,11 @@ export default class NetworkConfig extends LitElement {
         const macFilterInACL = `al-${portInfo.portName.replace(
           / \//,
           ''
-        )}-in in`;
+        )}-in`;
         const macFilterOutACL = `al-${portInfo.portName.replace(
           / \//,
           ''
-        )}-out out`;
+        )}-out`;
 
         if (smvMacsIngress.length > 0)
           accessListsIn.push(
@@ -383,6 +383,15 @@ export default class NetworkConfig extends LitElement {
             ].join('\n')
           );
 
+          const manufacturer = this.doc.querySelector(`:root > IED[name="${iedName}"]`)?.getAttribute('manufacturer') ?? 'Unknown'
+          const type = this.doc.querySelector(`:root > IED[name="${iedName}"]`)?.getAttribute('type') ?? 'Unknown'
+
+          let selSpecial = null
+          if (manufacturer === 'SEL' && (type === 'SEL_411L_2S' || type === 'SEL_487E_5S')) {
+            selSpecial = `\n  speed nonegotiate`
+          }
+        
+
         return `interface ${portInfo.portName}
   description ${this.substation} Protection ${this.protectionSystem} LAN ${
     this.prpNetwork
@@ -392,12 +401,12 @@ export default class NetworkConfig extends LitElement {
     vlans.length > 1 ? `,${vlans.join(',')}` : ''
   }
   switchport mode trunk
-  load-interval 30
+  load-interval 30${selSpecial !== null ? selSpecial: ''}
   spanning-tree portfast trunk
   service-policy input pm-dss-prot-vlan-mark-in
   service-policy output pm-dss-lan-out${
-    smvMacsIngress.length > 0 ? `\n  mac access-group ${macFilterInACL}` : ''
-  }${smvMacsEgress.length > 0 ? `\n  mac access-group ${macFilterOutACL}` : ''}
+    smvMacsIngress.length > 0 ? `\n  mac access-group ${macFilterInACL} in` : ''
+  }${smvMacsEgress.length > 0 ? `\n  mac access-group ${macFilterOutACL} out` : ''}
 !`;
       })
       .join('\n');
@@ -411,6 +420,10 @@ export default class NetworkConfig extends LitElement {
 
   protected firstUpdated(): void {
     this.refreshInputData();
+
+    this.addEventListener('updated-input-data-file', () => {
+      this.refreshInputData();
+    });
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -441,11 +454,12 @@ export default class NetworkConfig extends LitElement {
               // eslint-disable-next-line no-return-assign
               pasteText => (this.inputUI.value = pasteText)
             );
+            this.refreshInputData();
           }}
           >Paste
           <md-icon slot="icon">content_paste</md-icon>
         </md-outlined-button>
-        <md-outlined-button class="clippy" @click=${() => {
+        <md-outlined-button class="clippy" @click=${async () => {
           this.importCsvUI.click();
           this.refreshInputData();
         }}
@@ -555,6 +569,7 @@ export default class NetworkConfig extends LitElement {
         if (!file) return;
 
         this.inputUI.value = await file.text();
+        this.dispatchEvent(new CustomEvent('updated-input-data-file'));
       }} id="csv-input" accept=".csv,.txt" type="file"></input>
     `;
   }
