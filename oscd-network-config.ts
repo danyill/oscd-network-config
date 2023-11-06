@@ -365,7 +365,8 @@ export default class NetworkConfig extends LitElement {
             [
               `mac access-list extended ${macFilterInACL}`,
               smvMacsIngress.map(mac => `  permit host ${mac} any`).join('\n'),
-              `  deny   any any`,
+              `  deny any any 0x88ba 0x0`,
+              `  permit   any any`,
               `!`
             ].join('\n')
           );
@@ -375,7 +376,8 @@ export default class NetworkConfig extends LitElement {
             [
               `mac access-list extended ${macFilterOutACL}`,
               smvMacsEgress.map(mac => `  permit host ${mac} any`).join('\n'),
-              `  deny   any any`,
+              `  deny any any 0x88ba 0x0`,
+              `  permit   any any`,
               `!`
             ].join('\n')
           );
