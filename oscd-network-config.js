@@ -6610,10 +6610,10 @@ class NetworkConfig extends s$1 {
             .join('\n');
         const vlanNames = getVlanNames(this.doc, vlansOnSwitch);
         this.outputUI.value = [
+            vlanNames,
             interfaceDescriptions,
             accessListsIn.join('\n'),
             accessListsOut.join('\n'),
-            vlanNames,
             '!',
             '! ACL Removal Command',
             '!',
