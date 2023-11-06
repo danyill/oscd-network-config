@@ -24,180 +24,122 @@ import { TextField } from '@material/web/textfield/internal/text-field';
 // Tier 2 = 211 / 213           212 / 214
 // Tier 3 = 231 / 233 / 235     232 / 234 / 235
 
-type portData = {
-  type: string;
-  manufacturer: string;
-  configVersion: string;
-  ports: {
-    SV: {
-      A: string;
-      B: string;
-    };
-    GOOSE: {
-      A: string;
-      B: string;
-    };
-  };
-};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const relayPortInformation: portData[] = [
-  {
-    type: 'B30',
-    manufacturer: 'GE Multilin',
-    configVersion: '8.30',
-    ports: {
-      SV: {
-        A: '1A',
-        B: '1B'
-      },
-      GOOSE: {
-        A: '2',
-        B: '3'
-      }
-    }
-  },
-  {
-    type: 'SEL_487E_5S',
-    manufacturer: 'SEL',
-    configVersion: 'ICD-487E-5S-R003-V0-Z402006-D20211217',
-    ports: {
-      SV: {
-        A: '5A',
-        B: '5B'
-      },
-      GOOSE: {
-        A: '5A',
-        B: '5B'
-      }
-    }
-  },
-  {
-    type: 'SEL_411L_2S',
-    manufacturer: 'SEL',
-    configVersion: 'ICD-411L-2S-R001-V0-Z200006-D20210701',
-    ports: {
-      SV: {
-        A: '5A',
-        B: '5B'
-      },
-      GOOSE: {
-        A: '5A',
-        B: '5B'
-      }
-    }
-  },
-  {
-    type: 'SEL_2414',
-    manufacturer: 'SEL',
-    configVersion: 'ICD-2414-R109-V0-Z000000-D20210409',
-    ports: {
-      SV: {
-        A: 'Unavailable',
-        B: 'Unavailable'
-      },
-      GOOSE: {
-        A: '1A',
-        B: '1B'
-      }
-    }
-  },
-  {
-    type: 'PCS-221S',
-    manufacturer: 'NRR',
-    configVersion: '1.00',
-    ports: {
-      SV: {
-        A: '1',
-        B: '2'
-      },
-      GOOSE: {
-        A: '1',
-        B: '2'
-      }
-    }
-  },
-  {
-    type: '7SS85',
-    manufacturer: 'SIEMENS',
-    configVersion: 'V09.20.01',
-    ports: {
-      SV: {
-        A: 'F:CH1',
-        B: 'F:CH2'
-      },
-      GOOSE: {
-        A: 'F:CH1',
-        B: 'F:CH2'
-      }
-    }
-  },
-  {
-    type: '7SJ85',
-    manufacturer: 'SIEMENS',
-    configVersion: 'V09.20.01',
-    ports: {
-      SV: {
-        A: 'F:CH1',
-        B: 'F:CH2'
-      },
-      GOOSE: {
-        A: 'F:CH1',
-        B: 'F:CH2'
-      }
-    }
-  },
-  {
-    type: '7UT85',
-    manufacturer: 'SIEMENS',
-    configVersion: 'V09.20.01',
-    ports: {
-      SV: {
-        A: 'F:CH1',
-        B: 'F:CH2'
-      },
-      GOOSE: {
-        A: 'F:CH1',
-        B: 'F:CH2'
-      }
-    }
-  },
-  {
-    type: '6MU85',
-    manufacturer: 'SIEMENS',
-    configVersion: 'V09.20.01',
-    ports: {
-      SV: {
-        A: 'F:CH1',
-        B: 'F:CH2'
-      },
-      GOOSE: {
-        A: 'F:CH1',
-        B: 'F:CH2'
-      }
-    }
-  },
-  {
-    type: '7SL86',
-    manufacturer: 'SIEMENS',
-    configVersion: 'V09.20.01',
-    ports: {
-      SV: {
-        A: 'F:CH1',
-        B: 'F:CH2'
-      },
-      GOOSE: {
-        A: 'F:CH1',
-        B: 'F:CH2'
-      }
-    }
-  }
-];
-
 // Add: SEL-2440, SEL-751, P746 ??
 // Update versions
 
+const TPNS = 'https://transpower.co.nz/SCL/SCD/Communication/v1';
+
 const sampleData = ``;
+
+type Vlan = {
+  serviceName: string;
+  serviceType: string;
+  useCase: string;
+  prot1Id: string;
+  prot2Id: string;
+  busName?: string;
+};
+
+type AllocatedVlans = {
+  stationVlans: Vlan[] | null;
+  busVlans: Vlan[] | null;
+};
+
+function getAllocatedVlans(doc: XMLDocument): AllocatedVlans {
+  const vlanContainer = doc.querySelector(
+    'Private[type="Transpower-VLAN-Allocation"]'
+  );
+  const stationVlanContainer = vlanContainer?.getElementsByTagNameNS(
+    TPNS,
+    'Station'
+  );
+  const busVlanContainer = vlanContainer?.getElementsByTagNameNS(TPNS, 'Bus');
+
+  let stationVlans: Vlan[] | null = [];
+  let busVlans: Vlan[] | null = [];
+
+  // eslint-disable-next-line no-undef
+  const getVlans = (container: HTMLCollectionOf<Element> | undefined) => {
+    if (container) {
+      return Array.from(container[0].getElementsByTagNameNS(TPNS, 'VLAN')).map(
+        vlan => ({
+          serviceName: vlan.getAttribute('serviceName') ?? '',
+          serviceType: vlan.getAttribute('serviceType') ?? '',
+          useCase: vlan.getAttribute('useCase') ?? '',
+          prot1Id: vlan.getAttribute('prot1Id') ?? '',
+          prot2Id: vlan.getAttribute('prot2Id') ?? '',
+          busName: vlan.getAttribute('busName') ?? ''
+        })
+      );
+    }
+    return null;
+  };
+
+  stationVlans = getVlans(stationVlanContainer);
+  busVlans = getVlans(busVlanContainer);
+
+  return { stationVlans, busVlans };
+}
+
+function getVlanNames(doc: XMLDocument, vlansOnSwitch: Set<number>): string {
+  const outputConfigString: string[] = [];
+
+  const vlans: AllocatedVlans = getAllocatedVlans(doc);
+
+  const usedVlans = [];
+
+  if (vlans.busVlans) {
+    usedVlans.push(...vlans.busVlans);
+  }
+  if (vlans.stationVlans) {
+    usedVlans.push(...vlans.stationVlans);
+  }
+
+  const vlanMap: Map<number, string[]> = new Map();
+
+  usedVlans.forEach(vlan => {
+    if (!vlan) return;
+
+    const prot1Id = parseInt(vlan.prot1Id, 16);
+    const prot2Id = parseInt(vlan.prot2Id, 16);
+    if (vlansOnSwitch.has(prot1Id)) {
+      let name: string = '';
+      name = `${vlan.serviceName} ${vlan.serviceType} ${vlan.useCase}`.replace(
+        ' ',
+        '_'
+      );
+
+      if (vlan.busName) name = `${name}_${vlan.busName}`.replace(' ', '_');
+
+      vlanMap.set(prot1Id, [
+        '!',
+        `vlan ${prot1Id}`,
+        `  name ${name.slice(0, 32).replace(/ /g, '_')}`
+      ]);
+    }
+
+    if (vlansOnSwitch.has(prot2Id)) {
+      let name: string = '';
+      name = `${vlan.serviceName} ${vlan.serviceType} ${vlan.useCase}`;
+
+      if (vlan.busName) name = `${name} ${vlan.busName}`;
+
+      vlanMap.set(prot2Id, [
+        '!',
+        `vlan ${prot2Id}`,
+        `  name ${name.slice(0, 32).replace(/ /g, '_')}`
+      ]);
+    }
+  });
+
+  Array.from(vlanMap.keys())
+    .sort((a, b) => a - b)
+    .forEach(vlan => {
+      outputConfigString.push(vlanMap.get(vlan)!.join('\n'));
+    });
+
+  return outputConfigString.join('\n');
+}
 
 /**
  * A plugin which supplements data in the Communication section
@@ -292,6 +234,9 @@ export default class NetworkConfig extends LitElement {
     const accessListsIn: string[] = [];
     const accessListsOut: string[] = [];
 
+    const vlansOnSwitch: Set<number> = new Set();
+    const aclRemovalCommand: string[] = ['!'];
+
     const interfaceDescriptions = portsToConfigure
       .filter(portInfo => iedPorts.includes(portInfo.iedName))
       .map(portInfo => {
@@ -337,6 +282,8 @@ export default class NetworkConfig extends LitElement {
           .filter(vlan => vlan !== 0)
           .sort();
 
+        vlans.forEach(vlan => vlansOnSwitch.add(vlan));
+
         const smvMacsIngress = smvPublish
           .map(
             smv =>
@@ -360,27 +307,33 @@ export default class NetworkConfig extends LitElement {
           ''
         )}-out`;
 
-        if (smvMacsIngress.length > 0)
+        if (smvMacsIngress.length > 0) {
+          const name = `mac access-list extended ${macFilterInACL}`;
           accessListsIn.push(
             [
-              `mac access-list extended ${macFilterInACL}`,
-              smvMacsIngress.map(mac => `  permit host ${mac} any`).join('\n'),
+              name,
+              smvMacsIngress.map(mac => `  permit any host ${mac}`).join('\n'),
               `  deny any any 0x88ba 0x0`,
               `  permit   any any`,
               `!`
             ].join('\n')
           );
+          aclRemovalCommand.push(`no ${name}`);
+        }
 
-        if (smvMacsEgress.length > 0)
+        if (smvMacsEgress.length > 0) {
+          const name = `mac access-list extended ${macFilterOutACL}`;
           accessListsIn.push(
             [
-              `mac access-list extended ${macFilterOutACL}`,
-              smvMacsEgress.map(mac => `  permit host ${mac} any`).join('\n'),
+              name,
+              smvMacsEgress.map(mac => `  permit any host ${mac}`).join('\n'),
               `  deny any any 0x88ba 0x0`,
               `  permit   any any`,
               `!`
             ].join('\n')
           );
+          aclRemovalCommand.push(`no ${name}`);
+        }
 
         const manufacturer =
           this.doc
@@ -422,10 +375,17 @@ export default class NetworkConfig extends LitElement {
       })
       .join('\n');
 
+    const vlanNames = getVlanNames(this.doc, vlansOnSwitch);
+
     this.outputUI.value = [
       interfaceDescriptions,
       accessListsIn.join('\n'),
-      accessListsOut.join('\n')
+      accessListsOut.join('\n'),
+      vlanNames,
+      '!',
+      '! ACL Removal Command',
+      '!',
+      aclRemovalCommand.join('\n')
     ].join('\n');
   }
 
