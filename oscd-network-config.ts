@@ -378,10 +378,10 @@ export default class NetworkConfig extends LitElement {
     const vlanNames = getVlanNames(this.doc, vlansOnSwitch);
 
     this.outputUI.value = [
+      vlanNames,
       interfaceDescriptions,
       accessListsIn.join('\n'),
       accessListsOut.join('\n'),
-      vlanNames,
       '!',
       '! ACL Removal Command',
       '!',
