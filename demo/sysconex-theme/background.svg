@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <!-- Gradient definitions -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2a3d4f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a2838;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="blueWave1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2b5f7a;stop-opacity:0.7" />
+      <stop offset="50%" style="stop-color:#3a7a9e;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#2b5f7a;stop-opacity:0.7" />
+    </linearGradient>
+
+    <linearGradient id="blueWave2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1f4a5f;stop-opacity:0.8" />
+      <stop offset="50%" style="stop-color:#2e6885;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1f4a5f;stop-opacity:0.8" />
+    </linearGradient>
+
+    <linearGradient id="orangeWave" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#8a5a3a;stop-opacity:0.8" />
+      <stop offset="50%" style="stop-color:#b8874f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8a5a3a;stop-opacity:0.8" />
+    </linearGradient>
+
+    <linearGradient id="whiteWave" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#7a8a9a;stop-opacity:0.4" />
+      <stop offset="50%" style="stop-color:#9aabb8;stop-opacity:0.7" />
+      <stop offset="100%" style="stop-color:#7a8a9a;stop-opacity:0.4" />
+    </linearGradient>
+
+    <linearGradient id="grayWave" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3a4a5a;stop-opacity:0.6" />
+      <stop offset="50%" style="stop-color:#4a5a6a;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#3a4a5a;stop-opacity:0.6" />
+    </linearGradient>
+
+    <!-- Filters for glow effects -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur" />
+      <feMerge>
+        <feMergeNode in="coloredBlur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1400" height="900" fill="url(#bgGrad)" />
+
+  <!-- Four sine wave layers - evenly spaced vertically -->
+
+  <!-- Wave 1 - Gray/neutral - amplitude: 135, offset: 135 -->
+  <path d="M 0 135 Q 350 0, 700 135 T 1400 135 L 1400 900 L 0 900 Z"
+    fill="url(#grayWave)" opacity="0.8" />
+
+  <!-- Wave 2 - Light blue - amplitude: 135, offset: 337.5 -->
+  <path d="M 0 337.5 Q 350 202.5, 700 337.5 T 1400 337.5 L 1400 900 L 0 900 Z"
+    fill="url(#blueWave1)" opacity="0.85" />
+
+  <!-- Wave 3 - Orange - amplitude: 135, offset: 540 -->
+  <path d="M 0 540 Q 350 405, 700 540 T 1400 540 L 1400 900 L 0 900 Z"
+    fill="url(#orangeWave)" opacity="0.9" />
+
+  <!-- Wave 4 - Blue - amplitude: 135, offset: 742.5 -->
+  <path d="M 0 742.5 Q 350 607.5, 700 742.5 T 1400 742.5 L 1400 900 L 0 900 Z"
+    fill="url(#blueWave2)" opacity="0.85" />
+
+  <!-- White accent curve lines with glow - following sine patterns -->
+  <path d="M 0 200 Q 350 65, 700 200 T 1400 200"
+    fill="none" stroke="url(#whiteWave)" stroke-width="3" opacity="0.5" />
+
+  <path d="M 0 400 Q 350 265, 700 400 T 1400 400"
+    fill="none" stroke="url(#whiteWave)" stroke-width="5" opacity="0.7" filter="url(#glow)" />
+
+  <path d="M 0 600 Q 350 465, 700 600 T 1400 600"
+    fill="none" stroke="url(#whiteWave)" stroke-width="6" opacity="0.8" filter="url(#glow)" />
+
+  <path d="M 0 800 Q 350 665, 700 800 T 1400 800"
+    fill="none" stroke="url(#whiteWave)" stroke-width="5" opacity="0.7" filter="url(#glow)" />
+</svg>

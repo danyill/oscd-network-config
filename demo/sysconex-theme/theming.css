@@ -1,0 +1,101 @@
+/* Theme based on solarized colours: https://ethanschoonover.com/solarized/#usage-development */
+
+* {
+  --oscd-theme-heading: var(--ops-landing-light);
+  --oscd-shell-landing-heading-color: var(--oscd-theme-heading);
+
+  --oscd-theme-primary: var(--ops-primary-light);
+  --oscd-theme-secondary: var(--ops-secondary-light);
+  --oscd-theme-error: var(--ops-error-red);
+
+  --oscd-theme-base03: var(--ops-bg-lt-900);
+  --oscd-theme-base02: var(--ops-bg-lt-800);
+  /* optional emphasized content */
+  --oscd-theme-base01: var(--ops-bg-lt-700);
+  /* body text / primary content */
+  --oscd-theme-base00: var(--ops-bg-lt-600);
+
+  --oscd-theme-base0: var(--ops-bg-lt-300);
+  /* comments/secondary content */
+  --oscd-theme-base1: var(--ops-bg-lt-200);
+  /* background highlights */
+  --oscd-theme-base2: var(--ops-bg-lt-100);
+  /* background */
+  --oscd-theme-base3: var(--ops-bg-lt-50);
+
+  --oscd-theme-text-font: 'Fira Sans';
+  --oscd-theme-icon-font: 'Material Symbols Outlined';
+  --oscd-theme-text-font-mono: 'Roboto Mono';
+
+  --primary: var(--oscd-theme-primary);
+  --secondary: var(--oscd-theme-secondary);
+
+  --mdc-dialog-max-height: 90vh;
+  margin: 0px;
+  padding: 0px;
+}
+
+@media (prefers-color-scheme: dark) {
+  * {
+    --oscd-theme-heading: var(--ops-landing-dark);
+    --oscd-shell-landing-heading-color: var(--oscd-theme-heading);
+
+    --oscd-theme-primary: var(--ops-primary-dark);
+    --oscd-theme-secondary: var(--ops-secondary-dark);
+    --oscd-theme-error: var(--ops-error-red);
+
+    --oscd-theme-base03: var(--ops-bg-dk-900);
+    --oscd-theme-base02: var(--ops-bg-dk-800);
+    /* optional emphasized content */
+    --oscd-theme-base01: var(--ops-bg-dk-200);
+    /* body text / primary content */
+    --oscd-theme-base00: var(--ops-bg-dk-100);
+
+    --oscd-theme-base0: var(--ops-bg-dk-400);
+    /* comments/secondary content */
+    --oscd-theme-base1: var(--ops-bg-dk-500);
+    /* background highlights */
+    --oscd-theme-base2: var(--ops-bg-dk-600);
+    /* background */
+    --oscd-theme-base3: var(--ops-bg-dk-700);
+
+    --mdc-theme-text-disabled-on-light: rgba(255, 255, 255, 0.38);
+
+    /* Shell Customizations */
+
+    /* Landing page */
+    --oscd-shell-landing-heading-color: var(--oscd-theme-primary);
+    --oscd-shell-landing-subheading-color: var(--oscd-theme-primary);
+    --oscd-shell-landing-heading-size: 24px;
+
+    --oscd-shell-landing-card-background: var(--oscd-theme-base01);
+
+    /* App Bar */
+    --oscd-shell-app-bar-title-color: var(--oscd-theme-base00);
+
+    /* Plugins Menu */
+    --oscd-shell-plugins-menu-button-color: var(--oscd-theme-base00);
+    --oscd-shell-editor-plugins-panel-item-text-color: var(--oscd-theme-base00);
+    --oscd-shell-editor-plugins-panel-item-icon-color: var(--oscd-theme-base00);
+
+    --oscd-shell-file-menu-text-color: var(--oscd-theme-base00);
+    --oscd-shell-app-bar-action-icon-color: var(--oscd-theme-base00);
+  }
+}
+
+abbr {
+  text-decoration: none;
+  border-bottom: none;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+body {
+  background: url('./background.svg') no-repeat center center fixed;
+  background-size: cover;
+}

@@ -1,0 +1,35 @@
+* {
+  --ops-primary-light: #cb4b16;
+  /* alternatives #de8034, #cb4b16 */
+  --ops-landing-light: #ed8733;
+  --ops-secondary-light: #3790c8;
+  
+  --ops-primary-dark: #cb4b16;
+  --ops-landing-dark: #c7d8ee;
+  --ops-secondary-dark: #9dc6ff;
+
+  --ops-error-red: #dc2626;
+
+  --ops-bg-lt-50:  #f5f6f7; /* L* ~97 */
+  --ops-bg-lt-100: #e8eaed; /* L* ~92 */
+  --ops-bg-lt-200: #8c99a6; /* L* ~65 */
+  --ops-bg-lt-300: #7d8a97; /* L* ~60 */
+  --ops-bg-lt-400: #74818d; /* L* ~55 */
+  --ops-bg-lt-500: #667380; /* L* ~50 */
+  --ops-bg-lt-600: #5a6672; /* L* ~45 */
+  --ops-bg-lt-700: #404a54; /* L* ~32 */
+  --ops-bg-lt-800: #2a3036; /* L* ~20 */
+  --ops-bg-lt-900: #1f2428; /* L* ~15 */
+
+  --ops-bg-dk-50:  #d6e3f0;
+  --ops-bg-dk-100: #c7d5e4;
+  --ops-bg-dk-200: #9aa8b6;
+  --ops-bg-dk-300: #8897a6;
+  --ops-bg-dk-400: #768594;
+  --ops-bg-dk-500: #667584;
+  --ops-bg-dk-600: #566473;
+  --ops-bg-dk-700: #434f5b;
+  --ops-bg-dk-800: #303841;
+  --ops-bg-dk-900: #242b33;
+  
+}
