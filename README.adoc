@@ -20,16 +20,16 @@
 :uri-plugin: https://github.com/danyill/oscd-network-config
 :uri-ci-bundle: https://danyill.github.io/oscd-network-config/oscd-network-config.js
 :uri-material-icons: https://fonts.google.com/icons
-:uri-openscd-core-plugin-demo: https://danyill.github.io/oscd-network-config/index.deploy.html
+:uri-openscd-core-plugin-demo: https://danyill.github.io/oscd-network-config/index.html
 :source-highlighter: highlight.js
 
 == What is this?
 
-This plugin uses the information provide by the Network Data to create an initial configuration for Cisco IE-9320 devices including:
+This plugin uses the information from the SCL file and network topology data to create initial switch configurations and understand where traffic is flowing in the network. This can be used to support a range of use cases such as:
 
-* VLANs for GSE and SMV traffic
-* MAC address filtering for SMV traffic
-* Configuration of uplink/downlink ports.
+* Configuring VLANs for GSE and SMV traffic
+* Adding MAC address filtering for SMV traffic
+* Configuring uplink/downlink ports.
 
 Technically:
 

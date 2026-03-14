@@ -4,6 +4,7 @@
   "license": "Apache-2.0",
   "author": "Daniel Mulholland",
   "version": "0.0.1",
+  "type": "module",
   "main": "dist/oscd-network-config.js",
   "module": "dist/oscd-network-config.js",
   "exports": {
@@ -27,13 +28,19 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@material/mwc-snackbar": "^0.27.0",
     "@material/web": "^1.0.1",
-    "@openenergytools/scl-lib": "^0.7.14",
+    "@omicronenergy/oscd-shell": "^0.0.13",
     "@openscd/open-scd-core": "^0.0.2",
+    "@openscd/oscd-api": "^0.1.6",
+    "@openscd/scl-lib": "^2.0.0",
+    "@viz-js/viz": "^3.24.0",
+    "@webcomponents/scoped-custom-element-registry": "^0.0.10",
     "lit": "^3.0.1"
   },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.9.0",
+    "@omicronenergy/oscd-editor": "^1.7.1",
     "@open-wc/eslint-config": "^12.0.1",
     "@open-wc/testing": "^3.1.6",
     "@rollup/plugin-node-resolve": "^15.2.3",
@@ -70,7 +77,7 @@
     ],
     "rules": {
       "@typescript-eslint/no-unused-vars": [
-        "error"
+        2
       ],
       "import/no-unresolved": "off",
       "import/extensions": [

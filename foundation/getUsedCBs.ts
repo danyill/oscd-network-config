@@ -1,4 +1,4 @@
-import { sourceControlBlock } from '@openenergytools/scl-lib';
+import { sourceControlBlock } from '@openscd/scl-lib';
 
 /**
  * Ensures the nearest element is not within a Private element.
@@ -10,12 +10,19 @@ function isPublic(element: Element): boolean {
   return !element.closest('Private');
 }
 
-export function getUsedCBs(doc: XMLDocument): Map<Element, string[]> | null {
+export function getUsedCBs(
+  doc: XMLDocument | null | undefined
+): Map<Element, string[]> | null {
+  if (!doc?.documentElement) return null;
+
   // fetch unique control blocks and subscribing IEDs
   const controlBlocksAndIEDs = new Map<Element, string[]>();
   Array.from(doc.querySelectorAll('Inputs > ExtRef'))
     .filter(isPublic)
     .forEach(extRef => {
+      const iedName = extRef.getAttribute('iedName')?.trim() ?? '';
+      const srcCbName = extRef.getAttribute('srcCBName')?.trim() ?? '';
+      if (iedName === '' || srcCbName === '') return;
       const cb = sourceControlBlock(extRef);
       const ied = extRef.closest('IED')!.getAttribute('name')!;
 

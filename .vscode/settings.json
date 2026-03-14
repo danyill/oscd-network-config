@@ -1,0 +1,6 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "pdftotext": true,
+        "npx tsc": true
+    }
+}

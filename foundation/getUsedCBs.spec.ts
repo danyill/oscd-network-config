@@ -44,4 +44,9 @@ describe('Function to fetch control blocks', () => {
     const cbs = getUsedCBs(testDoc2);
     expect(cbs).is.equal(null);
   });
+
+  it('returns null if document is null or undefined', () => {
+    expect(getUsedCBs(null)).to.equal(null);
+    expect(getUsedCBs(undefined)).to.equal(null);
+  });
 });
